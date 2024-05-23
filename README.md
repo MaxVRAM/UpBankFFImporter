@@ -1,47 +1,127 @@
 # UP Bank to FireFly III Data Importer
+
 **This is still a work in progress**
 
-This program is designed to import transaction from Up Bank Australia into Firefly 3 either as a once off or continously. It is also able to detect if a transaction has been updated such as a new tag is added or category change in the Up Bank portal which will then update the transaction in Firefly to reflect this change. 
+This program is designed to import transaction from [Up](https://up.com.au) bank into [Firefly III](https://firefly-iii.org/). It is able to import transactions from Up Bank into Firefly III either as a once off or continuously. It is also able to detect if a transaction has been updated such as a new tag is added or category change in the Up Bank portal which will then update the transaction in Firefly to reflect this change.
 
-## Building
-Building is simple, just ensure you have rust installed and run the following,
-``cargo build``
+---
+
+## Build from Source
+
+Building is simple, just ensure you have **rust** and **cargo** installed on your system:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Then clone the repository and build:
+
+```bash
+cargo build
+```
+
 or
-``cargo build --release``
+
+```bash
+cargo build --release
+```
+
+---
 
 ## Setup
-- Copy the settings-template.yaml and rename it just settings.yaml
-- Add the url to your Firefly instance (eg 192.168.0.2:8083)
-- For each up bank account you wish to import data into firefly, do the following...
-  - Create a firefly account that represents your Up Bank Account
-  - In firefly add the unique id from Up Bank into the Firefly Account Number field. (This creates a direct link from the importer tool)
-  - Note: Passing the action "get-account-info" into the executable will print out all your Up Bank account information to the terminal which can be used to help setup your Firefly account information.
-  - Add the Upbank id into the accounts section in the settings.yaml, this tells the importer to only import this data.
 
-## Running
-Ensure you have setup your settings.yaml file before continuing
-### Command Line Help
-Linux & macOS : 
-``up_bank_fidi -?``
+### Step 1: Config File
 
-Windows: ``up_bank_fidi.exe -?``
+1. Duplicate `settings-template.yaml` as `settings.yaml` in the same directory.
+2. Modify the settings.yaml file with your details:
 
-### Getting Up Bank Account Information
-Linux & macOS : 
-``up_bank_fidi get-account-information``
+   - Add your **Up** personal access token. Generate a token here: [https://api.up.com.au](https://api.up.com.au)
+   - Add your **Firefly** personal access token. Go to `Options` -> `Profile` -> `OAuth` -> `Create new token`.
+   - Add the URL to your Firefly instance (eg `192.168.0.2:8083`)
+   - (optional) Import period in hours (for "periodic import" mode)
 
-Windows: ``up_bank_fidi.exe get-account-information``
+### Step 2: Firefly III Setup
 
-### Running the migrator tool
-See command line help assistant for setting start and end dates or date ranges.
+**Note**: You'll need a list of your Up account IDs. You can get these by:
 
-Linux & macOS : 
-``up_bank_fidi``
+   - Running `up_bank_fidi get-account-information`, or
+   - Using the Up API directly, for example, using Postman with your personal access token.
 
-Windows: ``up_bank_fidi.exe``
+Then set up and link Firefly accounts for your Up accounts:
+
+1. Create a Firefly account for each of your Up accounts ("_Spending_" account, plus each "_Saver_").
+2. Set the Firefly `account number` field to the associated Up account's unique ID.
+3. Add the Upbank id into the accounts section in the settings.yaml, this tells the importer to only import this data.
+
+---
+
+## CLI Usage
+
+Ensure you have setup your settings.yaml file before continuing.
+Run the CLI tool using `up_bank_fidi` (or `up_bank_fidi.exe` on Windows).
+
+- Command help:
+  ```bash
+  up_bank_fidi -h
+  ```
+- Getting Up bank account details:
+  ```bash
+  up_bank_fidi get-account-information
+  ```
+- Manually run an import (useful for testing):
+  ```bash
+  up_bank_fidi import
+  ```
+- Running the migrator tool:
+  ```bash
+  up_bank_fidi
+  ```
+
+---
 
 ## Docker
-This program is best used from a docker container. Provided is both a Dockerfile and a template Docker-Compose.yml file.
 
-### Docker Compose
-Docker compose is setup to be built from a repo clone. You may also point your host volumes elsewhere if required.
+- This program is best used from a docker container.
+- Provided is both a Dockerfile and a template `compose.yml` file.
+- Docker compose is setup to be built from a repo clone.
+- You may also point your host volumes elsewhere if required.
+
+Example `compose.yml` file:
+
+```yaml
+services:
+  up_bank_fidi:
+    build: .
+    container_name: up_bank_fidi
+    environment:
+      - RUST_LOG=info
+      - ACTION=periodic-import
+      - TZ=Australia/Sydney
+    volumes:
+      - ./settings.yaml:/app/settings.yaml
+      - ./logs:/logs
+    restart: unless-stopped
+```
+
+Alternatively, if you want to pre-build the image as, say `up-fidi`:
+
+```bash
+docker build -t up-fidi .
+```
+
+Then use the following `compose.yml` file:
+
+```yaml
+services:
+  up_bank_fidi:
+    image: up-fidi
+    container_name: up_bank_fidi
+    environment:
+      - RUST_LOG=info
+      - ACTION=periodic-import
+      - TZ=Australia/Sydney
+    volumes:
+      - ./settings.yaml:/app/settings.yaml
+      - ./logs:/logs
+    restart: unless-stopped
+```

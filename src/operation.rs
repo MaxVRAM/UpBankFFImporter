@@ -15,21 +15,21 @@ async fn run_import(
     sleep_duration: &std::time::Duration,
 ) -> Result<()> {
     import_data(args, up_bank, fire_fly, config).await?;
-    debug!("Continues import cycle complete, sleeping until next cycle");
+    debug!("Periodic import cycle complete, sleeping until next cycle");
     tokio::time::sleep(*sleep_duration).await;
     Ok(())
 }
 
-pub async fn continues_import(
+pub async fn periodic_import(
     mut args: Args,
     up_bank: up_bank::UpBank,
     fire_fly: fire_fly::FireFly,
     config: Config,
 ) -> Result<()> {
-    info!("Continues import schedule started.");
+    info!("Periodic import schedule started.");
     if args.end_date.is_some() || args.start_date.is_some() {
         return Err(eyre!(
-            "Start and End date can not be set when using a continues import operation"
+            "'Start' and 'End' date can not be set when using a periodic import operation"
         ));
     }
 
@@ -41,12 +41,12 @@ pub async fn continues_import(
         }
     }
 
-    let sleep_duration = chrono::Duration::hours(config.time_between_imports).to_std()?;
+    let sleep_duration = chrono::Duration::hours(config.import_hour_period).to_std()?;
 
     loop {
         tokio::select! {
             _ = signal::ctrl_c() => {
-                info!("Interupt signal recieved, exiting loop");
+                info!("Interrupt signal received, exiting loop");
                 break;
             },
             _ = run_import(&args, &up_bank, &fire_fly, &config, &sleep_duration) => {
@@ -112,7 +112,7 @@ pub async fn import_data(
             Some(days) => chrono::Duration::days(days),
             None => {
                 return Err(eyre!(
-                    "argument date range was not set but should have been if it got here."
+                    "Argument date range was not set but should have been if it got here."
                 ));
             }
         };

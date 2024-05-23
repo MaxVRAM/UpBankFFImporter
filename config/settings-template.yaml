@@ -1,5 +1,4 @@
-upbank_pan: ""
-ff_pan: ""
-ff_url: "127.0.0.1:8082"
-# Time between each import cycle in hours
-#time_between_imports: 1
+up_token: ""
+firefly_token: ""
+firefly_url: "127.0.0.1:8082"
+import_hour_period: 1

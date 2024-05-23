@@ -13,7 +13,7 @@ use config::Config;
 enum Action {
     Import,
     GetAccountInfo,
-    ContinuesImport,
+    PeriodicImport,
 }
 
 #[derive(Parser, Debug)]
@@ -47,7 +47,7 @@ async fn main() -> Result<()> {
         config.fire_fly_base_url.clone(),
     )?;
 
-    info!("FireFly and UpBank api initilised");
+    info!("FireFly and UpBank api initialised");
     up_bank.ping().await?;
     up_bank.populate_data().await?;
     info!("Up Bank connected and information gathered");
@@ -55,8 +55,8 @@ async fn main() -> Result<()> {
     match args.action {
         Action::Import => operation::import_data(&args, &up_bank, &fire_fly, &config).await?,
         Action::GetAccountInfo => operation::print_out_up_bank_account_info(up_bank)?,
-        Action::ContinuesImport => {
-            operation::continues_import(args, up_bank, fire_fly, config).await?
+        Action::PeriodicImport => {
+            operation::periodic_import(args, up_bank, fire_fly, config).await?
         }
     }
 

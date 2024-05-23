@@ -8,20 +8,20 @@ use std::io::prelude::*;
 use std::vec;
 use tracing::{debug, info};
 
-fn default_time_between_imports() -> i64 {
+fn default_import_hour_period() -> i64 {
     12
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    #[serde(rename = "upbank_pan")]
+    #[serde(rename = "up_token")]
     pub up_pan_token: String,
-    #[serde(rename = "ff_pan")]
+    #[serde(rename = "firefly_token")]
     pub fire_fly_pan_token: String,
-    #[serde(rename = "ff_url")]
+    #[serde(rename = "firefly_url")]
     pub fire_fly_base_url: String,
-    #[serde(default = "default_time_between_imports")]
-    pub time_between_imports: i64, // In hours
+    #[serde(default = "default_import_hour_period")]
+    pub import_hour_period: i64,
 }
 
 impl Config {
