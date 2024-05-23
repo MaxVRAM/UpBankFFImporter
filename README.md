@@ -102,26 +102,3 @@ services:
       - ./logs:/logs
     restart: unless-stopped
 ```
-
-Alternatively, if you want to pre-build the image as, say `up-fidi`:
-
-```bash
-docker build -t up-fidi .
-```
-
-Then use the following `compose.yml` file:
-
-```yaml
-services:
-  up_bank_fidi:
-    image: up-fidi
-    container_name: up_bank_fidi
-    environment:
-      - RUST_LOG=info
-      - ACTION=periodic-import
-      - TZ=Australia/Sydney
-    volumes:
-      - ./config/settings.yaml:/config/settings.yaml
-      - ./logs:/logs
-    restart: unless-stopped
-```
