@@ -98,7 +98,7 @@ services:
       - ACTION=periodic-import
       - TZ=Australia/Sydney
     volumes:
-      - ./settings.yaml:/app/settings.yaml
+      - ./config/settings.yaml:/config/settings.yaml
       - ./logs:/logs
     restart: unless-stopped
 ```
@@ -121,7 +121,7 @@ services:
       - ACTION=periodic-import
       - TZ=Australia/Sydney
     volumes:
-      - ./settings.yaml:/app/settings.yaml
+      - ./config/settings.yaml:/config/settings.yaml
       - ./logs:/logs
     restart: unless-stopped
 ```
