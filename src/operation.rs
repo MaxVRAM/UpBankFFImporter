@@ -15,7 +15,10 @@ async fn run_import(
     sleep_duration: &std::time::Duration,
 ) -> Result<()> {
     import_data(args, up_bank, fire_fly, config).await?;
-    debug!("Periodic import cycle complete, sleeping until next cycle");
+    debug!(
+        "Periodic import cycle complete, sleeping until next cycle: {:?}",
+        sleep_duration
+    );
     tokio::time::sleep(*sleep_duration).await;
     Ok(())
 }
@@ -26,7 +29,10 @@ pub async fn periodic_import(
     fire_fly: fire_fly::FireFly,
     config: Config,
 ) -> Result<()> {
-    info!("Periodic import schedule started.");
+    info!(
+        "Periodic import schedule started, importing every {} hours",
+        config.import_hour_period
+    );
     if args.end_date.is_some() || args.start_date.is_some() {
         return Err(eyre!(
             "'Start' and 'End' date can not be set when using a periodic import operation"
@@ -54,6 +60,7 @@ pub async fn periodic_import(
             }
         }
     }
+
     Ok(())
 }
 

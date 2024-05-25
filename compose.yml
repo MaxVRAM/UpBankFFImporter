@@ -1,15 +1,15 @@
 services:
-  up_bank_fidi:
+  up_fidi:
     build: .
-    container_name: up_bank_fidi
+    container_name: up_fidi
+    restart: unless-stopped
     environment:
       - RUST_LOG=info # Set to debug if issues occur
       - ACTION=periodic-import # Options: import, periodic-import
       # - DATE_RANGE=30 # Unspecified value will return all transaction. Define this after first use.
       # - START_DATE= # Optional
       # - END_DATE= # Optional
-      - TZ=Australia/Sydney
     volumes:
-      - ./settings.yaml:/app/settings.yaml
+      - ./config/settings.yaml:/config/settings.yaml
       - ./logs:/logs
-    restart: unless-stopped
+      - /etc/localtime:/etc/localtime:ro

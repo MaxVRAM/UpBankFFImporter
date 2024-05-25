@@ -15,11 +15,11 @@ fn default_import_hour_period() -> i64 {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     #[serde(rename = "up_token")]
-    pub up_pan_token: String,
+    pub up_token: String,
     #[serde(rename = "firefly_token")]
-    pub fire_fly_pan_token: String,
+    pub firefly_token: String,
     #[serde(rename = "firefly_url")]
-    pub fire_fly_base_url: String,
+    pub firefly_url: String,
     #[serde(default = "default_import_hour_period")]
     pub import_hour_period: i64,
 }

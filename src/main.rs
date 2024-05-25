@@ -41,16 +41,16 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     info!("Parsed arguments and updated config");
 
-    let mut up_bank = up_bank::UpBank::create(config.up_pan_token.clone())?;
+    let mut up_bank = up_bank::UpBank::create(config.up_token.clone())?;
     let fire_fly = fire_fly::FireFly::create(
-        config.fire_fly_pan_token.clone(),
-        config.fire_fly_base_url.clone(),
+        config.firefly_token.clone(),
+        config.firefly_url.clone(),
     )?;
 
-    info!("FireFly and UpBank api initialised");
+    info!("Firefly and Up API initialised");
     up_bank.ping().await?;
     up_bank.populate_data().await?;
-    info!("Up Bank connected and information gathered");
+    info!("Up connected and information gathered");
 
     match args.action {
         Action::Import => operation::import_data(&args, &up_bank, &fire_fly, &config).await?,

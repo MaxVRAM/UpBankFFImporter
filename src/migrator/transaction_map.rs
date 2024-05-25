@@ -11,7 +11,7 @@ pub enum TransferType {
 
 use super::account_map;
 
-pub async fn find_up_bank_transaction_in_fire_fly(
+pub async fn find_up_transaction_in_firefly(
     up_bank_transaction: &up_bank::transactions::Transaction,
     fire_fly: &fire_fly::FireFly,
 ) -> Result<bool> {
@@ -21,7 +21,7 @@ pub async fn find_up_bank_transaction_in_fire_fly(
     Ok(!transction_data.is_empty())
 }
 
-pub async fn get_fire_fly_transction_from_up_bank_id(
+pub async fn get_firefly_transaction_from_up(
     up_bank_transaction: &up_bank::transactions::Transaction,
     fire_fly: &fire_fly::FireFly,
 ) -> Result<Vec<fire_fly::transaction::TransactionData>> {
@@ -40,7 +40,7 @@ pub fn is_account_internal(
         .map(|result| result.fire_fly_account_id.clone())
 }
 
-pub fn convert_up_bank_transaction_to_fire_fly(
+pub fn convert_up_transaction_to_firefly(
     up_bank_transaction: &up_bank::transactions::Transaction,
     account_map: &[account_map::AccountMap],
 ) -> Result<TransferType> {
@@ -99,7 +99,7 @@ pub fn convert_up_bank_transaction_to_fire_fly(
         {
             Ok(data) => {
                 let account = is_account_internal(&data.id, account_map).ok_or(eyre!(
-                    "account should have mapped across from upbank to firefly"
+                    "account should have mapped across from up to firefly"
                 ))?;
                 fire_fly_transaction.source_id = Some(account);
             }
@@ -139,7 +139,7 @@ pub fn convert_up_bank_transaction_to_fire_fly(
             Ok(data) => {
                 let account = is_account_internal(&data.id, account_map).ok_or_else(|| {
                     eyre!(
-                    "account should have mapped across from upbank to firefly, account number: {}",
+                    "account should have mapped across from up to firefly, account number: {}",
                     data.id
                 )
                 })?;

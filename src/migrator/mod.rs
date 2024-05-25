@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use crate::{
-    fire_fly, migrator::transaction_map::get_fire_fly_transction_from_up_bank_id, up_bank,
+    fire_fly, migrator::transaction_map::get_firefly_transaction_from_up, up_bank,
 };
 
 use self::{
@@ -61,7 +61,7 @@ impl Migrator {
         let mut needs_update_counter = 0;
         let mut already_imported_counter = 0;
 
-        let tag: String = "UBFF3Import".to_string();
+        let tag: String = "UpImport".to_string();
 
         for transaction in up_bank_transaction {
             match self.transaction_tracker.find_transaction(&transaction) {
@@ -101,7 +101,7 @@ impl Migrator {
         transaction: &up_bank::transactions::Transaction,
     ) -> Result<()> {
         let fire_fly_transactions =
-            get_fire_fly_transction_from_up_bank_id(transaction, &self.fire_fly_api).await?;
+            get_firefly_transaction_from_up(transaction, &self.fire_fly_api).await?;
 
         // Error out if multiple transactions are found as cant determine which one should be updated.
         if fire_fly_transactions.len() != 1 {
@@ -157,7 +157,7 @@ impl Migrator {
         tag: &str,
     ) -> Result<bool> {
         let was_found =
-            transaction_map::find_up_bank_transaction_in_fire_fly(transaction, &self.fire_fly_api)
+            transaction_map::find_up_transaction_in_firefly(transaction, &self.fire_fly_api)
                 .await?;
         if !was_found {
             debug!("Importing up bank transaction: {}", transaction.id);
@@ -188,7 +188,7 @@ impl Migrator {
         up_bank_transaction: &up_bank::transactions::Transaction,
         import_tag: &Option<String>,
     ) -> Result<TransactionType> {
-        match transaction_map::convert_up_bank_transaction_to_fire_fly(
+        match transaction_map::convert_up_transaction_to_firefly(
             up_bank_transaction,
             &self.account_map,
         )? {

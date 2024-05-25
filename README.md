@@ -42,7 +42,7 @@ cargo build --release
 
 ### Step 2: Firefly III Setup
 
-**Note**: You'll need a list of your Up account IDs. You can get these by:
+**Note**: You'll need a list of the Up IDs for each account. You can get these by:
 
    - Running `up_bank_fidi get-account-information`, or
    - Using the Up API directly, for example, using Postman with your personal access token.
@@ -51,7 +51,7 @@ Then set up and link Firefly accounts for your Up accounts:
 
 1. Create a Firefly account for each of your Up accounts ("_Spending_" account, plus each "_Saver_").
 2. Set the Firefly `account number` field to the associated Up account's unique ID.
-3. Add the Upbank id into the accounts section in the settings.yaml, this tells the importer to only import this data.
+3. Add the Up ID into the accounts section in the settings.yaml, this tells the importer to only import this data.
 
 ---
 
@@ -90,15 +90,15 @@ Example `compose.yml` file:
 
 ```yaml
 services:
-  up_bank_fidi:
+  up_fidi:
     build: .
-    container_name: up_bank_fidi
+    container_name: up_fidi
+    restart: unless-stopped
     environment:
       - RUST_LOG=info
       - ACTION=periodic-import
-      - TZ=Australia/Sydney
     volumes:
       - ./config/settings.yaml:/config/settings.yaml
       - ./logs:/logs
-    restart: unless-stopped
+      - /etc/localtime:/etc/localtime:ro
 ```
